@@ -16,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/rayala26/liri-node-app/issues"
   },
-  "homepage": "https://github.com/rayala26/liri-node-app#readme"
+  "homepage": "https://github.com/rayala26/liri-node-app#readme",
+  "dependencies": {
+    "dotenv": "^5.0.1",
+    "inquirer": "^5.2.0",
+    "node-spotify-api": "^1.0.7",
+    "npm": "^5.8.0",
+    "request": "^2.85.0",
+    "twitter": "^1.7.1"
+  }
 }
