@@ -4,7 +4,7 @@ var keys = require('./keys.js');
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var request = require('request');
-var require = require('inquirer');
+var inquirer = require('inquirer');
 // var fs = require('fs');
 
 var spotify = new Spotify(keys.spotify);
@@ -13,68 +13,27 @@ var omdbKey = keys.omdb.API_Key
 
 
 
-function myTweets(){
+var myTweets = function(){
 	var params = {screen_name: 'RobAce26', count: 20};
-	twitter.get(
-		'statuses/user_timeline',
-		params,
-		function(error, tweets, response) {
-  		if (error) {
-    		console.log(error);
-  		}else{
-  			tweets.forEach(function(tweet){
-	  			var tweetOutput = "Tweet: " + tweet.text + "\n" +
-	  				"Published: " + tweet.created_at + "\n";
-	  			// console.log(tweetOutput);
-	  			logText(tweetOutput);
-  			})
-  		}
-  		// Reenable the start prompt until the user exits the app.
-  		start();
-	});
+	twitter.get('statuses/user_timeline', params, function(error, tweets, response) {
+  		if (!error) {
+    		// console.log(error);
+	  		for (var i = 0; i < tweets.length; i++){
+                console.log(`"${tweets[i].text}" created on ${tweets[i].created_at}`);
+            }
+        }
+    });
 }
 
-function chosenSpotify(userSpotInput){
-	spotify.search({
-		type: 'track',
-		query: userSpotInput
-	}, function(err, userSpotInput) {
-	    if (err) {
-	        console.log('Error occurred: ' + err);
-	        return;
-	    }else{
-	    	var userSI = userSpotInput.tracks.items[0];
-	  		var spotifyOutput = "Artist: " + userSI.artists[0].name + "\n" +
-	  			"Song Name: " + userSI.name + "\n" +
-	  			"Spot Link: " + userSI.external_urls.spotify + "\n" +
-	  			"Album: " + userSI.album.name + "\n";
-	  		// console.log(spotifyOutput);
-	  		logText(spotifyOutput);			
-	    }
-	    // Reenable the start prompt until the user exits the app.
-	    start();
+var spotifyThisSong = function(song) {
+	spotify.search({ type: 'track', query: song, limit: 1}, function(err, data) {
+		if(err) {
+			return console.log("Sorry cannot find song");
+		}
+		console.log("Artist: " + data.tracks.items[0].album.artists[0].name);
+		console.log("Song: " + data.tracks.items[0].album.external_urls.spotify);
+		console.log("Album: " + data.tracks.items[0].album.name);
 	});
-}
-
-
-
-function randomChoice(){
-	fs.readFile("random.txt", 'utf8', function(error, data) {		    
-		// If the code experiences any errors it will log the error to the console. 
-	    if(error) {
-	        return console.log(error);
-	    }else{
-	    	var dataArr = data.split(",");
-	    	var userFirstInput = dataArr[0];
-	    	var userSecondInput = dataArr[1];
-
-	    	switch(userFirstInput){
-	    		case "spotify-this-song":
-	    			chosenSpotify(userSecondInput);
-	    			break;
-	    	}
-	    }
-	}); 		
 }
 
 
@@ -84,7 +43,7 @@ function start(){
 			type: "list",
 			name: "whatToPick",
 			message: "Which one would you like to check out?",
-			choices: ["My Twitter", "Spotify", "Movies", "Random", "Exit"] 
+			choices: ["My Twitter", "Spotify", "Movies", "Exit"] 
 		}
 	]).then(function(user) {
 		if (user.whatToPick == "My Twitter"){
